@@ -41,7 +41,7 @@ class Memojito(object):
             # XXX this could be potentially big, a custom key should
             # be used if the arguments are expected to be big
 
-            key = (func.__name__, args, frozenset(kwargs.items()))
+            key = (func.__name__, args, frozenset(list(kwargs.items())))
             val = cache.get(key, _marker)
             if val is _marker:
                 val=func(*args, **kwargs)

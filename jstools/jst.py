@@ -2,7 +2,7 @@
 Integration for creating sphinx compatible docs from javascript source
 comments
 """
-from ConfigParser import ConfigParser
+from configparser import ConfigParser
 from jinja2 import Template
 from jstools import tsort
 import os
@@ -25,7 +25,7 @@ class DocParser(ConfigParser):
     def from_fn(cls, fn, defaults=None):
         """Load up config files in our parser."""
         parser = cls(defaults)
-        if isinstance(fn, basestring):
+        if isinstance(fn, str):
             fn = fn,
         fns = parser.read(fn)
         assert fns, ValueError("No valid config files: %s" % fns)
@@ -38,7 +38,7 @@ class DocParser(ConfigParser):
         cfg = dict(self.items(section))
         for key in self.key_list:
             val = cfg.setdefault(key, [])
-            if isinstance(val, basestring):
+            if isinstance(val, str):
                 cfg[key]=[x for x in val.split() if not x.startswith('#')]
         for key in self.keys:
             cfg.setdefault(key, None)
@@ -50,7 +50,7 @@ class DocParser(ConfigParser):
         for section in sections:
             cfg = self.make_cfg(section)
             #@@ use logging
-            print("Extracting docs for %s" % section)
+            print(("Extracting docs for %s" % section))
             sourcedir = cfg['root']
             outdir = cfg['output']
             # gather data for each source file
@@ -67,7 +67,7 @@ class DocParser(ConfigParser):
         
             # create dict of dependencies
             dependencies = {}
-            for filepath, jsfile in files.items():
+            for filepath, jsfile in list(files.items()):
                 dependencies[filepath] = jsfile.extends
             
             # extend data with any data from parents
@@ -189,7 +189,7 @@ class SourceFile(object):
                 self.data["_parents"].insert(0, data)
             else:
                 self.data["_parents"] = [data]
-            for key, value in data.items():
+            for key, value in list(data.items()):
                 if isinstance(value, list):
                     # concatenate with any existing list
                     if key in self._data:

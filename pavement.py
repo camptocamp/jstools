@@ -13,7 +13,7 @@ from paver.tasks import help, needs
 from paver.easy import call_task
 from setuptools import find_packages
 from paver.setuputils import setup
-from ConfigParser import ConfigParser
+from configparser import ConfigParser
 from paver import setuputils
 
 setuputils.install_distutils_tasks()

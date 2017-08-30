@@ -19,7 +19,7 @@ def compress(input, args, cfg):
     new_env = dict(os.environ)
     if len(paths):
         new_env['CLASSPATH'] = paths.pop()
-    elif not new_env.has_key("CLASSPATH"):
+    elif "CLASSPATH" not in new_env:
         info("No CLASSPATH found in environment or configuration")
 
     proc = subprocess.Popen(arg_string.split(" "), stdout=subprocess.PIPE, env=new_env)
@@ -102,7 +102,7 @@ def find_paths(args, cfg, limit=False):
     return paths['jarpath'], paths['classpath'],
 
 def nondestructive_populate(valmap, path_map):
-    for key in path_map.keys():
+    for key in list(path_map.keys()):
         if not path_map.get(key):
             path_map[key] = valmap.get(key)
     return path_map

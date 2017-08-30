@@ -20,7 +20,7 @@ def setup_dir(cp, which=None, prefix=None):
 
     filenames = dict(item for item in cp.items(which) if item[0] in care)
 
-    for fn in filenames.values():
+    for fn in list(filenames.values()):
         fnames = fn.split("\n")
         h = [mkdir_file(name, prefix) for name in fnames if name]
         handles.extend(h)
@@ -35,12 +35,12 @@ def mkdir_file(filename, prefix=""):
     assert not path.endswith('js')
     try:
         os.makedirs(path)
-    except OSError, e:
+    except OSError as e:
         if e.errno != 17:
             raise
     fpath = os.path.join(prefix, filename)
     fileh = open(fpath, "wr")
-    print >> fileh, "var filename='%s';" %filename.strip()
+    print("var filename='%s';" %filename.strip(), file=fileh)
     fileh.close()
     return fileh
 
@@ -60,7 +60,7 @@ def write_deps(formatted_deps, filename):
 
 def inject_deps(handles, libdir, depmap):
     pmap = dict((x.name.split("/")[-1], x.name) for x in handles)
-    for fn in pmap.keys():
+    for fn in list(pmap.keys()):
         alias = depmap.guess_alias_by_filename(fn)
         if alias is None:
             continue

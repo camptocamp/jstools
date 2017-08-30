@@ -1,7 +1,7 @@
 from wsgiproxy.app import WSGIProxyApp
 from cgi import parse_qs
 
-import urlparse
+import urllib.parse
 import logging
 import functools
 
@@ -14,7 +14,7 @@ def param_forwarding(sfe):
         if url is not None:
             if isinstance(url, list):
                 assert len(url) == 1, ValueError('Multiple urls submitted')
-                url = urlparse.urlparse(url[0])
+                url = urllib.parse.urlparse(url[0])
             else:
                 raise ValueError('We expected a list')
 

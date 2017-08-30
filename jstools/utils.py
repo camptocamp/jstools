@@ -3,8 +3,8 @@ utils.py
 
 Copyright (c) 2008 OpenGeo. All rights reserved.
 """
-from ConfigParser import NoSectionError
-from ConfigParser import ConfigParser
+from configparser import NoSectionError
+from configparser import ConfigParser
 from UserDict import DictMixin
 import sys
 import logging
@@ -53,7 +53,7 @@ class SectionMap(DictMixin):
         self.cp.set(self.section, key, value)
 
     def keys(self):
-        return dict(self.section_items).keys()
+        return list(dict(self.section_items).keys())
 
 def load_return(section=None):
     cp = ConfigParser()
