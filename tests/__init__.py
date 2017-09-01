@@ -1,1 +1,1 @@
-from test import test_suite
+from .test import test_suite

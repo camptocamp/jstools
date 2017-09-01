@@ -3,10 +3,10 @@ merge.py
 
 Copyright (c) 2008 OpenGeo. All rights reserved.
 """
-from ConfigParser import ConfigParser
+from configparser import ConfigParser
 from jstools import REQ, DIST
 from jstools import tsort
-from StringIO import StringIO
+from io import StringIO
 from pprint import pprint
 import logging
 import os
@@ -58,7 +58,7 @@ class Merger(ConfigParser):
     def from_fn(cls, fn, output_dir=None, root_dir=None, defaults=None, printer=logger):
         """Load up a list of config filenames in our merger"""
         merger = cls(output_dir, root_dir, defaults=defaults, printer=printer)
-        if isinstance(fn, basestring):
+        if isinstance(fn, str):
             fn = fn,
         fns = merger.read(fn)
         assert fns, ValueError("No valid config files: %s" %fns)
@@ -104,9 +104,9 @@ class Merger(ConfigParser):
         complete = False
         while not complete:
             complete = True
-            for filepath, info in files.items():
+            for filepath, info in list(files.items()):
                 for path in info.include + info.requires:
-                    if path not in exclude and not files.has_key(path):
+                    if path not in exclude and path not in files:
                         complete = False
                         for sourcedir in sourcedirs:
                             if os.path.exists(os.path.join(self.root_dir, sourcedir, path)):
@@ -117,7 +117,7 @@ class Merger(ConfigParser):
         
         # create list of dependencies
         dependencies = {}
-        for filepath, info in files.items():
+        for filepath, info in list(files.items()):
             dependencies[filepath] = info.requires
 
         
@@ -138,7 +138,7 @@ class Merger(ConfigParser):
         ## Make sure all imports are in files dictionary
         for part in parts:
             for fp in cfg[part]:
-                if not fp in exclude and not files.has_key(fp):
+                if not fp in exclude and fp not in files:
                     raise MissingImport("File from '%s' not found: %s" % (part, fp))
 
         ## Output the files in the determined order
@@ -175,7 +175,7 @@ class Merger(ConfigParser):
         cfg = dict(self.items(section))
         for key in self.key_list:
             val = cfg.setdefault(key, [])
-            if isinstance(val, basestring):
+            if isinstance(val, str):
                 cfg[key]=[x for x in val.split() if not x.startswith('#')]
         for key in self.keys:
             cfg.setdefault(key, None)
@@ -196,7 +196,7 @@ class Merger(ConfigParser):
         header = "Building %s" % section
         self.printer.debug("%s\n%s" % (header, "-" * len(header)))
         merged = self.merge(cfg)
-        if cfg.has_key('output'):
+        if 'output' in cfg:
             outputfilename = cfg['output']
         else:
             outputfilename = os.path.join(self.output_dir, section)
@@ -246,11 +246,11 @@ class Merger(ConfigParser):
         license = StringIO()
         seen = []
         for name in newfiles:
-            print >> catted, cat[name]
+            print(cat[name], file=catted)
             if name in lic:
                 licout = lic[name]
                 if licout not in seen: #slow?
-                    print >> license, licout
+                    print(licout, file=license)
                     seen.append(licout)
 
 
@@ -286,7 +286,8 @@ class Merger(ConfigParser):
             if license:
                 self.printer.debug("Adding license file: %s" %cfg['license'])
                 merged = "\n".join((license, merged))
-            file(outputfilename, "w").write(merged)
+            with open(outputfilename, "w") as f:
+                f.write(merged)
                 
             newfiles.append(outputfilename)
         return newfiles

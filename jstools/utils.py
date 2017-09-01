@@ -3,9 +3,9 @@ utils.py
 
 Copyright (c) 2008 OpenGeo. All rights reserved.
 """
-from ConfigParser import NoSectionError
-from ConfigParser import ConfigParser
-from UserDict import DictMixin
+from configparser import NoSectionError
+from configparser import ConfigParser
+from collections import MutableMapping
 import sys
 import logging
 import os
@@ -32,7 +32,7 @@ def arg_parser(optparser):
         return caller
     return wrapper
 
-class SectionMap(DictMixin):
+class SectionMap(MutableMapping):
     def __init__(self, cp, section):
         if not cp.has_section(section):
             raise NoSectionError("%s does not exist in %s" %(section, cp))
@@ -53,7 +53,7 @@ class SectionMap(DictMixin):
         self.cp.set(self.section, key, value)
 
     def keys(self):
-        return dict(self.section_items).keys()
+        return list(dict(self.section_items).keys())
 
 def load_return(section=None):
     cp = ConfigParser()

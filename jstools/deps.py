@@ -1,7 +1,7 @@
-from ConfigParser import ConfigParser
-from ConfigParser import NoSectionError
+from configparser import ConfigParser
+from configparser import NoSectionError
 from jstools import utils, merge
-from memoize import memoizedproperty
+from .memoize import memoizedproperty
 import logging
 import pkg_resources
 
@@ -35,7 +35,7 @@ class DepMap(ConfigParser):
     @classmethod
     def from_path(cls, path, defaults=None, printer=logger):
         dmap = cls(defaults=defaults, printer=printer)
-        if isinstance(path, basestring):
+        if isinstance(path, str):
             path = path,
         paths = dmap.read(path)
         assert paths, ValueError("No valid config files: %s" %paths)
@@ -43,7 +43,7 @@ class DepMap(ConfigParser):
 
     @memoizedproperty
     def reverse_alias_map(self):
-        return dict((v, k) for k, v in self.alias_map.items())
+        return dict((v, k) for k, v in list(self.alias_map.items()))
     
     def get_dependencies_by_filename(self, filename):
         alias = self.reverse_alias_map[filename]
@@ -58,24 +58,24 @@ class DepMap(ConfigParser):
     get_deps = get_dependencies_by_alias
 
     def guess_alias_by_filename(self, filename, sorter=sorted, single=True):
-        guesses = (self.reverse_alias_map.get(fn) for fn in sorter(self.reverse_alias_map.keys()) if fn.endswith(filename))
+        guesses = (self.reverse_alias_map.get(fn) for fn in sorter(list(self.reverse_alias_map.keys())) if fn.endswith(filename))
         
         if single:
             try:
-                return guesses.next()
+                return next(guesses)
             except StopIteration:
                 return None
         return guesses
 
     def formatted_dependencies(self, alias):
-        for directive, aliases in self.get_deps(alias).items():
+        for directive, aliases in list(self.get_deps(alias).items()):
             for alias in aliases.split():
                 try:
                     yield self.template[directive] %self.alias_map[alias]
                 except KeyError:
                     raise AliasNotFound("Alias '%s' not found in %s. "
                                         "Check dependency cfg for alias mismatch." \
-                                        %(alias, self.alias_map.keys()))
+                                        %(alias, list(self.alias_map.keys())))
 
             
 class AliasNotFound(KeyError):

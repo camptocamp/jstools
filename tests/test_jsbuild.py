@@ -1,9 +1,9 @@
 from jstools import deps, merge, DIST, REQ
-from ConfigParser import ConfigParser
+from configparser import ConfigParser
 import os
 import pkg_resources
 import re
-import utils as testutils
+from . import utils as testutils
 from jstools.yuicompressor import find_paths
 import os
 
