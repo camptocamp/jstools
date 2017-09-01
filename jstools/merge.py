@@ -286,7 +286,8 @@ class Merger(ConfigParser):
             if license:
                 self.printer.debug("Adding license file: %s" %cfg['license'])
                 merged = "\n".join((license, merged))
-            file(outputfilename, "w").write(merged)
+            with open(outputfilename, "w") as f:
+                f.write(merged)
                 
             newfiles.append(outputfilename)
         return newfiles
